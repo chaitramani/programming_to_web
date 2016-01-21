@@ -1,0 +1,32 @@
+h1{
+  text-align : center;
+  color : red;}
+body{
+  background-color : #f3f4b2;
+}
+.pngl{
+  color : green;
+  font-family : arial;
+}
+.lang{
+  color : #0fafd2;
+}
+.bookname{
+  color : red;
+}
+a{
+  color : red;
+  }
+table, th,td{
+  border : 1px solid pink;
+}
+table th{
+  background-color : #f3d5a2;
+  
+}
+ul{color : brown;}
+h4{color:violet;}
+.class{color : blue;}
+#lk{
+;
+}
