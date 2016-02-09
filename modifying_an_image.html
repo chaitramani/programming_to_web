@@ -1,0 +1,73 @@
+<html>
+  <title>
+    <head>Basic Colors</head>
+  </title>
+ <body>
+  <h1>Modifying an image</h1>
+   <p>
+   <h3>Image Created</h3>
+   
+   <p>Original Image</p>
+   </p>
+   <a href = "http://i.imgur.com/ZkCTHnv.png?1">
+     <img src = "http://i.imgur.com/ZkCTHnv.png?1" title = "smallpanda"/></a>
+  <p>
+    Here is the modifyed image</p>
+  <a href = "http://i.imgur.com/23kdxWh.png?1">
+     <img src = "http://i.imgur.com/23kdxWh.png?1" title = "Blurredpanda"/></a>
+  <h3>Algorithm</h3>
+  <p>
+   In this program we use math functions to create a blurred copy of an image. The way we will blur the image is by scrambling pixels that are near each other.
+
+We begin by creating a blank image and writing the loop to let us color each pixel in the image. For each pixel we will do one of two things: half the time, we will simply copy the pixel from the old picture into the new picture without changing anything. The other half of the time we will find a pixel nearby and copy that one instead.
+
+Now we must figure out how to find a "nearby" pixel. We will define some value for how far away the new pixel will be (we used 20 pixels) and then we write a function that will give a (x,y) point that is a random amount between 0 and 10 pixels away in each direction. Before we use the new (x,y) point, we must check to be sure it is still a valid pixel position in the image. For example, we may be at a pixel that is on the very top of the image. Our random point generator tells us to go up by 3 pixels, but since we are on the top of the image (y = 0) we cannot very well go up by three pixels (y would be -3)! If the random number is too big (larger than the dimension -1) or too small (less than 0) then we will just use the closest number that is valid.
+
+Once we have a valid pixel that is some amount away we use its red, green, and blue values as the new pixel's values.
+  </p>
+  <h3>Code</h3>
+  <pre>
+// blur by moving random pixels
+function ensureInImage (coordinate, size) {
+    // coordinate cannot be negative
+    if (coordinate < 0) {
+        return 0;
+    }
+    // coordinate must be in range [0 .. size-1]
+    if (coordinate >= size) {
+        return size - 1;
+    }
+    return coordinate;
+}
+
+function getPixelNearby (image, x, y, diameter) {
+    var dx = Math.random() * diameter - diameter / 2;
+    var dy = Math.random() * diameter - diameter / 2;
+    var nx = ensureInImage(x + dx, image.getWidth());
+    var ny = ensureInImage(y + dy, image.getHeight());
+    return image.getPixel(nx, ny);
+}
+
+
+var image = new SimpleImage("smallpanda.png");
+var output = new SimpleImage(image.getWidth(), image.getHeight());
+
+for (var pixel of image.values()) {
+    var x = pixel.getX();
+    var y = pixel.getY();
+    if (Math.random() > 0.5) {
+        var other = getPixelNearby(image, x, y, 10);
+        output.setPixel(x, y, other);
+    }
+    else {
+        output.setPixel(x, y, pixel);
+    }
+}
+print(image)
+print(output);
+
+;
+
+  </pre>
+  </body>
+   </html>

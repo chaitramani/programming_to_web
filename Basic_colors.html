@@ -1,0 +1,49 @@
+<html>
+  <title>
+    <head>Basic Colors</head>
+  </title>
+ <body>
+  <h1>Basic Colors</h1>
+   <p>
+   <h3>Image created by scratch</h3>
+   Here is my image created through algorithm</p>
+   <a href = "http://i.imgur.com/Dbz7SE3.png?1">
+     <img src = "http://i.imgur.com/Dbz7SE3.png?1" title = "source imgur.com"/></a>
+  <h3>Algorithm</h3>
+  <p>
+  In this program first step is to getting a 300*300 blank image,then setting the rgb values.for this a function called distance is written to get the distance between the pixel coordinates to set the colors.
+  Top-right and bottom-left is shaded with blue color .</p>
+  <h3>code</h3>
+  <pre>
+function dist(pixel, x,y) 
+{
+     var dx = pixel.getX() - x;
+     var dy = pixel.getY() - y;
+     return  Math.sqrt(dx+0.1 * dx+0.1 + dy *dy);
+ }
+ 
+var image = new SimpleImage( 300,300);
+
+for(var pixel of image.values()){
+    
+     if (dist(pixel, 110,110)< 50){
+         pixel.setRed(255-6*dist(pixel,110,110));
+     }
+      if (dist(pixel, 50,50)< 30){
+         pixel.setRed(255-10*dist(pixel,50,50));
+     }
+     else if (dist(pixel, 200,200)< 80){
+         pixel.setGreen(255-3*dist(pixel,200,200));
+     }
+     else if (Math.random() >  0.999) {
+         pixel.setRed(255);
+         pixel.setGreen(255);
+     }
+     pixel.setBlue(Math.max(0.5*pixel.getY() - pixel.getX(),
+                            pixel.getX() - 1.5* pixel.getY()));
+                            
+}
+print(image);
+  </pre>
+  </body>
+   </html>
