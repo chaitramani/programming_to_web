@@ -1,0 +1,172 @@
+<html>
+  <title>
+    <head>Steganography</head>
+  </title>
+ <body>
+  <h1>Steganography</h1>
+   <p>
+   <h3>cropped images</h3>
+   <table><tr><th><b>start image</b></th>
+     <th><b>hide image</b></th></tr>
+     <tr><td><a href = "http://i.imgur.com/RkmKrK9.png?1">
+       <img src = "http://i.imgur.com/RkmKrK9.png?1" title = "chapel"/></a></td>
+       <td><a href = "http://i.imgur.com/HACAGWI.png?1">
+         <img src = "http://i.imgur.com/HACAGWI.png?1" title = "lion"/></a></td></tr>
+   </table>
+   <p><b>Images after Exctraction</b></p>
+   </p>
+  <table><tr><th><b>extractedstart image</b></th>
+     <th><b>extractedhidden image</b></th></tr>
+     <tr><td><a href = "http://i.imgur.com/oPUnrem.png?1">
+       <img src = "http://i.imgur.com/oPUnrem.png?1" title = "Extractedchapel"/></a></td>
+       <td><a href = "http://i.imgur.com/lToeOtD.png?1">
+         <img src = "http://i.imgur.com/lToeOtD.png?1" title = "ExtractedLion"/></a></td></tr>
+   </table>
+  
+  <h3>Algorithm</h3>
+  <p>
+   First, the original image is prepared for the hiding of the image to be hidden. For this purpose, the lower n bits are cleared, i.e. in this case the lower 2 bits have been cleared.
+Next, the image to be hidden is prepared. This is done by shifting the upper n bits to the right by (8-n) bit positions. In my program, this is accomplished by dividing each value for red, green and blue by 2 to the power of (8-n) and flooring the result.
+Finally, the two images are being combined: A new image is being created of the same dimensions of the two images to be combined with. For each pixel contained in the new image, the corresponding red values at the same locations in the two source images are added up to form the red value of the new image's pixel. Similarly, the green and blue values are added up.
+If the secret image should be extracted, the following algorithm is used: A new image is created with the dimensions of the "Image with hidden image". For each pixel in the new image, the corresponding pixel in the input image is extracted in the following manner: Each color channel is taken modulo 2 to the power of bit depth; in case of the images above, this is 2 to the power of 2, or 4. The result is multiplicated by 2 to the power of (8-n) (64) in order to shift up the image information to the upper bits of the result pixel.
+  </p>
+  <h3>Code</h3>
+  <pre>
+ var start= new SimpleImage("chapel.png");
+var hide = new SimpleImage ("smalllion.jpg");
+
+function crop(image, width, height){
+     var n = new SimpleImage(width,height);
+     for(var p of image.values()){
+       var x = p.getX();
+       var y = p.getY();
+     if (width >x && height > y){
+     var np = n.getPixel(x,y);
+     np.setRed(p.getRed());
+     np.setBlue(p.getBlue());
+     np.setGreen(p.getGreen()); 
+}     }
+     return n;
+}
+
+   var cropWidth = start.getWidth();
+   
+if ( cropWidth>hide.getWidth()) {
+    cropWidth = hide.getWidth();
+}
+
+var cropHeight = start.getHeight();
+
+if (cropHeight > hide.getHeight()) {
+    cropHeight = hide.getHeight();
+}
+
+start = crop(start,cropWidth, cropHeight);
+hide = crop(hide,cropWidth, cropHeight);
+print(start);
+print(hide);
+print("Start image dimensions (width, height");
+print(start.getWidth(), start.getHeight());
+print("Red pixel at 50,50 in start image");
+var sPixel = start.getPixel(50,50);
+print(sPixel.getRed());
+print("Hide image dimensions (width, height");
+print (hide.getWidth(), hide.getHeight());
+print("Red pixel at 50,50 in hide image");
+var hPixel = hide.getPixel(50,50);
+print(hPixel.getRed());
+
+function pixchange(pixval){
+    var x = Math.floor(pixval/16) * 16;
+    return x;
+}
+
+function chop2hide(image){
+    for(var px of image.values()){
+        px.setRed(pixchange(px.getRed()));
+        px.setGreen(pixchange(px.getGreen()));
+        px.setBlue(pixchange(px.getBlue()));
+    }
+    return image;
+}
+
+function shift(im){
+  var nim = new SimpleImage(im.getWidth(), 
+                            im.getHeight());
+  for(var px of im.values()){
+    var x = px.getX();
+    var y = px.getY();
+    var npx = nim.getPixel(x,y);
+    npx.setRed(Math.floor(px.getRed()/64));
+    npx.setGreen(Math.floor(px.getGreen()/64));
+    npx.setBlue(Math.floor(px.getBlue()/64));
+  }
+  return nim;
+}
+
+function newpv(p,q) {
+     if (answer > 255)  print("error: answer too big");     var answer = p + q;
+     return answer;
+}
+
+function combine(a,b){
+     var n = new SimpleImage(a.getWidth(), a.getHeight());
+     for(var pa of a.values()){
+ var x = pa.getX();
+var y = pa.getY();
+var pb = b.getPixel(x,y);
+var np = n.getPixel(x,y);
+np.setRed(newpv(pa.getRed(),pb.getRed()));
+np.setGreen(newpv(pa.getGreen(),pb.getGreen()));
+np.setBlue(newpv(pa.getBlue(),pb.getBlue()));
+     }
+     return n;
+}
+
+
+start = chop2hide(start);
+
+hide = shift(hide);
+var stego = combine(start,hide);
+print(start);
+print("Red pixel at 50,50 in start image after shift");
+var sPixel = start.getPixel(50,50);
+print(sPixel.getRed());
+print(hide);
+print("Red pixel at 50,50 in hide image after shift");
+var hPixel = hide.getPixel(50,50);
+print(hPixel.getRed());
+print (stego);
+print("Red pixel at 50,50 in stego image");
+var stPixel = stego.getPixel(50,50);
+print(stPixel.getRed());
+
+//begin extraction
+function extractHdImg(stego){
+
+for(var px of stego.values()){
+    var pxSe=4;
+    var pxSt=64
+
+px.setRed(pxSt*(px.getRed()%pxSe));/* the modulus of the division is multiplied by 16 */
+
+px.setGreen(pxSt*(px.getGreen()%pxSe));
+
+px.setBlue(pxSt*(px.getBlue()%pxSe));
+
+}
+
+
+return stego;
+
+}
+
+extractHdImg(stego);
+print(stego);
+print("Red pixel at 50,50 in stego after extraction image");
+var stPixel = stego.getPixel(50,50);
+print(stPixel.getRed());
+
+  </pre>
+  </body> 
+   </html>
